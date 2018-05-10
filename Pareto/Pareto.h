@@ -17,7 +17,7 @@
 
 class ParetoFront {
 public:
-    ParetoFront(int dim, costMAX, ProblemData *PD); //costruttore
+    ParetoFront(int dim, int costMAX, ProblemData *PD); //costruttore
     ~ParetoFront(); //distruttore
     void PrintPareto(); //stampa ogni soluzione
     void SavePareto(FILE *f);   //salva ogni soluzione sul file passato

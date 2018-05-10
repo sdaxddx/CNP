@@ -2,13 +2,13 @@
 // Created by Sdaxddx
 //
 #include "Pareto.h"
-#include <stdio.h>
+#include <stdio.io>
 #include <stdlib.h>
 #include <math.h>
 
 ParetoFront::ParetoFront(int dim, int costMAX, ProblemData *PD) {
     this->dim = dim;
-    this->costMax = costMAX;
+    this->costMAX = costMAX;
     this->PWC = new int[dim];
     this->prec = new int[dim];
     this->succ = new int[dim];
@@ -96,7 +96,7 @@ BandBnode *lastlist(BandBnode *List) {
     return last;
 }
 
-bool endlist(BandBnode *p, BandBnode *List) {
+bool endlist(BandBnode *p, BandBnode *List) {   //se p è l'ultimo elemento della lista allora sarà uguale a List
     return p==List;
 }
 
@@ -111,21 +111,22 @@ void insert_before (BandBnode *node, BandBnode *p){  //inserisce node prima di p
     p->prec = node;
 }
 
-bool is_emptylist(BandBnode *List){
+bool is_emptylist(BandBnode *List){ //controlla se la lista è vuota, controllando che ci sia solo l'elemento List
     if((List->prec = List) && (List->succ = List))
         return true;
     else
         return false;
 }
 
-void insert_BnBnode(BandBnode *node, BandBnode *List, int VisitStrategy) {
+void insert_BnBnode(BandBnode *node, BandBnode *List, int VisitStrategy) {  //inserisce un nodo nella lista in base al tipo di visita
     BandBnode *p;
     if (VisitStrategy == DEPTH_FIRST)   //inserisco il nodo come primo elemneto della lista, p==primo elemento
         p = firstlist(List);
     else if (VisitStrategy == BREADTH_FIRST)    //inserisco il nodo come ultimo elemento della lista, p==List
         p = nextlist(lastlist(List));
     else if(VisitStrategy == BEST_FIRST) { //lista ordinata per costi crescenti, trovo il costo peggiore
-        while ((node.LB[0] >= p.LB[0]) || (fabs(node->LB[0]-p->LB[0]) < EPSILON && node->LB[1] >= p->LB[1]) && !endlist(p, List))
+        P = firstlist(List);
+        while ((node.LB[0] >= p.LB[0]) || (fabs(node->LB[0]-p->LB[0]) < EPSILON && node->LB[1] >= p->LB[1]) && !endlist(p, List))   // A OR (B AND C)
             p = nextlist(p);
     }
     insert_before(node, p);
