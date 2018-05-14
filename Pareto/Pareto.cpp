@@ -2,7 +2,7 @@
 // Created by Sdaxddx
 //
 #include "Pareto.h"
-#include <stdio.io>
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -65,8 +65,8 @@ void ParetoFront::UpdatePareto(int PWC, int cost, int time) {
     }
 
     while((cost != this->costMAX) && (PWC < this->PWC[cost])) {
-        this->PWC[costo] = PWC;
-        costo = this->succ[costo];
+        this->PWC[cost] = PWC;
+        cost = this->succ[cost];
     }
 }
 
@@ -77,6 +77,8 @@ BandBnode::BandBnode(int id, int livello) {
     this->succ = nullptr;
     this->prec = nullptr;
     this->type = 0;
+    this->var = 0;
+    this->id_figlio = 0;
 }
 
 BandBnode::~BandBnode() {
@@ -85,21 +87,34 @@ BandBnode::~BandBnode() {
     delete[] this->LB;
 }
 
-//List è un nodo di chiusura, che viene prima del primo elemento della lista e dopo l'ultimo elemento
-BandBnode *firstlist(BandBnode *List) {
+/**
+ * Given a List return its first element
+ * @return the first element of the list
+ */
+BandBnode *firstlist(BandBnode *List) {//List è un nodo di chiusura, che viene prima del primo elemento della lista e dopo l'ultimo elemento
     BandBnode *first = List->succ;
     return first;
 }
 
+/**
+ * Given a List return its last element
+ * @return the last element of the list
+ */
 BandBnode *lastlist(BandBnode *List) {
     BandBnode *last = List->prec;
     return last;
 }
 
+/**
+ * Given a element and its list check if the node is the last element of the list
+ */
 bool endlist(BandBnode *p, BandBnode *List) {   //se p è l'ultimo elemento della lista allora sarà uguale a List
     return p==List;
 }
 
+/**
+ * Given a element of a list return the next element of the List
+ */
 BandBnode *nextlist(BandBnode *p){  // ritorna l'elemento successivo a p
     return p->succ;
 }
@@ -111,6 +126,9 @@ void insert_before (BandBnode *node, BandBnode *p){  //inserisce node prima di p
     p->prec = node;
 }
 
+/**
+ * Given a List check if it is empty
+ */
 bool is_emptylist(BandBnode *List){ //controlla se la lista è vuota, controllando che ci sia solo l'elemento List
     if((List->prec = List) && (List->succ = List))
         return true;
@@ -118,6 +136,9 @@ bool is_emptylist(BandBnode *List){ //controlla se la lista è vuota, controllan
         return false;
 }
 
+/**
+ * Given a node and a List add the node in the list based on the visit strategy
+ */
 void insert_BnBnode(BandBnode *node, BandBnode *List, int VisitStrategy) {  //inserisce un nodo nella lista in base al tipo di visita
     BandBnode *p;
     if (VisitStrategy == DEPTH_FIRST)   //inserisco il nodo come primo elemneto della lista, p==primo elemento
@@ -132,4 +153,13 @@ void insert_BnBnode(BandBnode *node, BandBnode *List, int VisitStrategy) {  //in
     insert_before(node, p);
 }
 
-BandBnode* Extractlist (BandBnode* *)
+BandBnode* Extractlist (BandBnode* *pp, BandBnode* L)	//passa un puntatore di nodi (array di nodi) e la lista da cui estrarli
+{
+  BandBnode *q;
+  q = *pp;
+  q->prev->next = q->next;
+  q->next->prev = q->prev;
+  *pp = q->next;
+
+  return q;
+}

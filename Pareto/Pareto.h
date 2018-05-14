@@ -12,6 +12,7 @@
 #define PAIRWISEMAX 100000000 //TODO calculate max PairWise Connectivity
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 
