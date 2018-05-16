@@ -14,36 +14,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
 class ParetoFront {
 public:
-    ParetoFront(int dim, int costMAX, ProblemData *PD); //costruttore
-    ~ParetoFront(); //distruttore
-    void PrintPareto(); //stampa ogni soluzione
-    void SavePareto(FILE *f);   //salva ogni soluzione sul file passato
-    bool DominatedPoint(int PWC, int cost); //controlla se la soluzione passata è dominata da quelle del fronte
-    void UpdatePareto(int PWC, int cost, int time); //aggiorna il fronte se la soluzione passata non è dominata
+	ParetoFront(int dim, int costMAX); //costruttore
+	~ParetoFront(); //distruttore
+	void PrintPareto(); //stampa ogni soluzione
+	void SavePareto(FILE *f);   //salva ogni soluzione sul file passato
+	bool DominatedPoint(int PWC, int cost); //controlla se la soluzione passata è dominata da quelle del fronte
+	void UpdatePareto(int PWC, int cost, int time); //aggiorna il fronte se la soluzione passata non è dominata
 
-private:    //or package
-    int dim;    //dimensione del fronte di pareto = numero soluzioni
-    int costMIN;    //costo associato alla PAIRWISEMAX (=0)
-    int costMAX;    //costo associato alla PAIRWISE nulla (= attack vector)
-    int *PWC;   //soluzioni associate a ogni costo
-    int *prec, *succ, *time;    //rispettivamente soluzione precedente, successiva e tempo di esecuzione
-
+private:
+	//or package
+	int dim;    //dimensione del fronte di pareto = numero soluzioni
+	int costMIN;    //costo associato alla PAIRWISEMAX (=0)
+	int costMAX;    //costo associato alla PAIRWISE nulla (= attack vector)
+	int *PWC;   //soluzioni associate a ogni costo
+	int *prec, *succ, *time; //rispettivamente soluzione precedente, successiva e tempo di esecuzione
 
 };
 
-class BandBnode{
+class BandBnode {
 public:
-    BandBnode(int id, int livello);
-    ~BandBnode();
+	BandBnode(int id, int livello);
+	~BandBnode();
+	bool useful(ParetoFront* PF);
 
 private:
-    int id, livello, id_figlio; //debug, non essenziali
-    BandBnode *prec, *succ; //nodi contigui
-    int var, type; // tipo di branching
-    int LB[2]; //soluzioni del nodo //  LB[0] == costo     LB[1] == PWC
+	int id, livello, id_figlio; //debug, non essenziali
+	BandBnode *prec, *succ; //nodi contigui
+	int var, type; // tipo di branching
+	int LB[2]; //soluzioni del nodo //  LB[0] == PWC     LB[1] == COSTO
 };
 #endif //PROJECT_PARETO_H
