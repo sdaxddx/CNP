@@ -13,16 +13,36 @@
 
 using namespace std;
 
+struct Node {
+	unsigned int id;
+	unsigned int degree;
+	vector<int> neighbours;
+};
+
+/*
+struct Edge {
+	unsigned int id;
+	Node* id_from;
+	Node* id_to;
+	//int cost;
+};
+*/
+
 class Graph {
 protected:
-	int num_nodes;
-	int num_edges;
+	unsigned int num_nodes;
+	unsigned int num_edges;
 	int* degrees;
 
 	int** adjacency_list;
 	set<int> edges;
 
 	vector< pair<int,int> > edge_list;
+
+	/****************************************
+	 ***** 		 Diverso sistema 		*****
+	 ***************************************/
+	vector<Node> node_vector;
 
 public:
 	Graph(int nodes, int edges, int num_neighbours);
