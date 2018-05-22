@@ -12,7 +12,7 @@
 #include <cassert>
 #include <fstream>
 #include <cstring>
-//#include <list>
+#include <list>
 
 using namespace std;
 
@@ -37,17 +37,20 @@ protected:
 	unsigned int num_edges;
 	int* degrees;
 
-	int** adjacency_list;
-	//list<int> *adj;
+	vector<int> *adj;	//array of vector of type int
 
-	set<int> edges;
-
-	vector< pair<int,int> > edge_list;
+	set<int> edges;	//set of edges
+	/*
+	 * int** adjacency_list;
+	 *
+	 *vector< pair<int,int> > edge_list;
+	 */
 
 	/****************************************
 	 ***** 		 Diverso sistema 		*****
 	 ***************************************/
-	vector<Node> node_vector;
+	//vector<Node> node_vector;
+
 public:
 	Graph(int nodes, int edges, int *num_neighbours);
 	virtual ~Graph();
@@ -70,14 +73,14 @@ public:
 	    return ((i*(i-1))>>1) + j; // i * (i-1) diviso due + j..//
 	  }
 
-	int* /*const*/ get_adgacency(int i) const {
+	vector<int>* /*const*/ get_adgacency(int i) const {
 		assert(0<=i && i<num_nodes);
-		    return adjacency_list[i];
+		    return adj[i];
 		}
-
-	vector< pair<int,int> > get_edge_list() const {
-		return edge_list;
-		}
+//
+//	vector< pair<int,int> > get_edge_list() const {
+//		return edge_list;
+//		}
 
 	bool is_edge(int i, int j) const //i deve essre maggiore di j
 	  {
@@ -94,10 +97,13 @@ public:
 	void add_edge(int i, int j);
 	void del_edge(int i, int j);
 
-	void load_graph(ifstream *file, string *name) {
-	}
+	void load_graph(ifstream *file, string *name);
 
-	int pairwise();
+	vector<vector<int>> connected_component_list();
+
+	void depth_search(int n, bool* visited, vector<int>* vect);
+
+	int pairwise(vector< vector<int> > component_list);
 };
 
 #endif /* PARETO_GRAPH_H_ */
