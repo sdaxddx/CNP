@@ -9,6 +9,8 @@
 
 Graph::Graph(int nodes, int edges, int* num_neighbours) : num_nodes(nodes), num_edges(edges) {
 	adjacency_list = alloc_nodes<int*>();
+	//adj = new list<int>[nodes];
+
 	degrees = alloc_nodes<int>();
 	for(int i=0; i < nodes; i++) {
 		adjacency_list[i] = new int[num_neighbours[i]];
@@ -58,4 +60,33 @@ void Graph::del_edge(int i, int j) {
 			adjacency_list[i][pos] = adjacency_list[i][degrees[--i]];
 	}
 }
+
+void Graph::load_graph(ifstream *file, string *name) {
+	string file_string;
+	char* tkn;
+
+	file(name, ifstream::in);
+	file_string << file;
+
+	char* buf_file = file_string;
+	file->close();
+
+	tkn = strtok(buf_file, "\n");
+	while(tkn != nullptr) {
+		char* bufline = strtok(tkn, " ;");
+		int i = toDigit();
+
+		while(bufline != nullptr) {
+			add_edge(i, toDigit(bufline));
+			tkn = (strtok(NULL, " ;"));
+		}
+
+		tkn = (strtok(NULL, "\n"));
+	}
+}
+
+int toDigit(char *c) {
+	return c - '0';
+}
+
 

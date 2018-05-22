@@ -10,6 +10,9 @@
 #include <vector>
 #include <set>
 #include <cassert>
+#include <fstream>
+#include <cstring>
+//#include <list>
 
 using namespace std;
 
@@ -35,6 +38,8 @@ protected:
 	int* degrees;
 
 	int** adjacency_list;
+	//list<int> *adj;
+
 	set<int> edges;
 
 	vector< pair<int,int> > edge_list;
@@ -43,9 +48,8 @@ protected:
 	 ***** 		 Diverso sistema 		*****
 	 ***************************************/
 	vector<Node> node_vector;
-
 public:
-	Graph(int nodes, int edges, int num_neighbours);
+	Graph(int nodes, int edges, int *num_neighbours);
 	virtual ~Graph();
 
 	template<class T> T *alloc_nodes(void);
@@ -90,8 +94,10 @@ public:
 	void add_edge(int i, int j);
 	void del_edge(int i, int j);
 
-	int pairwise();
+	void load_graph(ifstream *file, string *name) {
+	}
 
+	int pairwise();
 };
 
 #endif /* PARETO_GRAPH_H_ */
