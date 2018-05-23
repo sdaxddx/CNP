@@ -13,6 +13,8 @@
 #include <fstream>
 #include <cstring>
 #include <list>
+#include <bitset>
+//#include <unordered_map>
 
 using namespace std;
 
@@ -37,7 +39,8 @@ protected:
 	unsigned int num_edges;
 	int* degrees;
 
-	vector<int> *adj;	//array of vector of type int
+	vector< vector<int> > adj;//vector of vector of type int
+	//unordered_map< int, set<int> > adj;
 
 	set<int> edges;	//set of edges
 	/*
@@ -53,6 +56,8 @@ protected:
 
 public:
 	Graph(int nodes, int edges, int *num_neighbours);
+	Graph(FILE* f);
+	Graph(Graph* g);
 	virtual ~Graph();
 
 	template<class T> T *alloc_nodes(void);
@@ -96,6 +101,12 @@ public:
 
 	void add_edge(int i, int j);
 	void del_edge(int i, int j);
+	void del_node(int i);
+
+	int get_max_degree();
+	void gen_vertex_cover();
+
+	void update_Graph(std::bitset* removed_nodes);
 
 	void load_graph(ifstream *file, string *name);
 
@@ -103,7 +114,13 @@ public:
 
 	void depth_search(int n, bool* visited, vector<int>* vect);
 
-	int pairwise(vector< vector<int> > component_list);
+	int pairwise();
 };
+
+//class Reduced_Graph: public Graph {
+//public:
+//	Reduced_Graph(Graph original, set<int> deleted_vertices) : Graph(int nodes, int edges, int* num_neighbours);
+//	virtual ~Reduced_Graph();
+//};
 
 #endif /* PARETO_GRAPH_H_ */

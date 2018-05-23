@@ -7,12 +7,17 @@
 
 #include "ProblemData.h"
 
-ProblemData::ProblemData() {
-	// TODO Auto-generated constructor stub
-
+ProblemData::ProblemData(FILE* file) {
+	original = new Graph(file);
 }
 
 ProblemData::~ProblemData() {
-	// TODO Auto-generated destructor stub
+	delete original, current;
+}
+
+void ProblemData::update_current(std::bitset* removed_nodes) {
+	delete current;	//chiamo il decostruttore del problema corrente
+	current(original);	//creo un nuovo grafo uguale all'originale
+	current.update_Graph(removed_nodes);	//aggiorno con i dati correnti
 }
 

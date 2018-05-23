@@ -9,7 +9,7 @@
 #include <algorithm>
 
 Graph::Graph(int nodes, int edges, int* num_neighbours) : num_nodes(nodes), num_edges(edges) {
-	adj = new vector<int>[num_nodes];
+	adj = new vector<int>(num_nodes);
 	//adj = new list<int>[nodes];
 	degrees = new int[nodes];
 
@@ -17,6 +17,14 @@ Graph::Graph(int nodes, int edges, int* num_neighbours) : num_nodes(nodes), num_
 		adj[i] = new int[num_neighbours[i]];
 		degrees[i] = num_neighbours[i]; 	//=0?
 	}
+}
+
+//TODO
+Graph::Graph(FILE *f) {
+
+}
+
+Graph::Graph(Graph* g) :num_nodes(g->num_nodes), num_edges(g->num_edges), adj(g->adj), degrees(g->degrees) {
 }
 
 Graph::~Graph() {
@@ -70,8 +78,80 @@ void Graph::add_edge(int i, int j) {
 //}
 
 void Graph::del_edge(int i, int j) {
-	adj[i].erase( (adj[i].begin(), adj[i].end(), j), adj[i].end() );
+	adj[i].erase( (adj[i].begin(), adj[i].end(), j), adj[i].end() );	//cancel j from the adjacency list of i
+	adj[j].erase( (adj[j].begin(), adj[j].end(), i), adj[j].end() );	//cancel i from the adcacency list of j
+
 }
+
+void Graph::del_node(int i) {
+	num_nodes--;
+	for(auto const& node : adj[i]) {	//cancel all adjacency node of i
+		del_edge(i, node);
+		num_edges--;
+	}
+	adj.erase( (adj.begin(), adj.end(), adj[i]), adj.end() );	//cancel i from the adjacency list
+
+}
+
+int Graph::get_max_degree() {
+	int max = 0;
+	for(int i = 0; i<num_nodes; i++) {
+		if (degrees[i] > max)
+			max = degrees[i];
+	}
+	return max;
+}
+
+int Graph::gen_vertex_cover(vector<int>& res) {
+	vector<int> deg(num_nodes);
+	std::bitset<num_nodes> C;
+	int edges = 0, cur = 0;
+
+
+	for(int i=0; i<num_nodes; i++) {
+		deg[i] = this->degrees[i];
+		C[i] = 0;
+	}
+
+	  do {
+		  int maxi = 0;
+		  for(int i=0; i<num_nodes; i++) {
+		      if(deg[i] > maxi && C[i] == 0)
+		    	  maxi = deg[i];
+		      	  cur = i;
+		    }
+
+	      C[cur] = 1;
+	    //cout<<"cur==-1 => "<<cur<<endl;
+
+	    //cout<<"Qui, cur="<<cur<<endl;
+
+	    for(int j=0; j<this->degrees[cur]; ++j) { //per tutti i vicini del nodo corrente
+	    	if(C[adj(cur)[j]] == 0) {
+	    		deg[adj(cur)[j]]--;
+	    		edges++;
+	    	}
+	    }
+	  } while(edges<num_edges);
+
+	  res.clear();
+	  for(int i=0; i<num_nodes(); ++i) {
+	    if( C[i] == 1 ) {
+	      res.push_back(i);
+	    }
+	  }
+
+	  return C.size();
+
+}
+
+void Graph::update_Graph(std::bitset* removed_nodes) {
+	for(std::size_t i = 0; i < removed_nodes->size(); ++i) {	//for all nodes passed delete them from graph
+		if (removed_nodes[i] == 1)
+			del_node(i);
+	}
+}
+
 void Graph::load_graph(ifstream *file, string *name) {
 	string file_string;
 	char* tkn;
@@ -101,14 +181,14 @@ vector< vector<int> > Graph::connected_component_list() {
 	vector< vector<int> > component_list;
 	int i=0;
 
-	for(int n=0; n < num_nodes; n++) {
+	for(int n=0; n < num_nodes; n++) {	//inizializzo tutti i nodi come NON visitati
 		visited[n] = false;
 	}
 
-	for(int n=0; n < num_nodes; n++) {
-		if(visited[n]==false) {
+	for(int n=0; n < num_nodes; n++) {	//itero tutti i nodi guardando se sono visitati o meno
+		if(visited[n]==false) {	//se non sono visitati faccio una DEPTH SEARCH
 			depth_search(n, visited, &component_list[i]);
-			i++;
+			i++;	//poiché ho trovato tutti i nodi di una componente passo alla successiva
 		}
 	}
 	return component_list;
@@ -116,17 +196,17 @@ vector< vector<int> > Graph::connected_component_list() {
 
 void Graph::depth_search(int n, bool* visited, vector<int>* vect) {
 	visited[n] = true;	//il nodo attuale viene segnato come visitato
-	vect->push_back(n);
+	vect->push_back(n);	//aggiungo il nodo alla componente attuale
 
-	for(const auto& node : vect) {
-		if(!visited[*node])
-			depth_search(*node, visited, vect);
+	for(const auto& node : adj[n]) {	//itero per tutti i nodi adiacenti
+		if(!visited[node])	//se il nodo non è visitato applica una DEPTH SEARCH
+			depth_search(node, visited, vect);
 	}
 }
 
-int Graph::pairwise(vector< vector<int> > component_list) {
+int Graph::pairwise() {
 	int pairwise = 0;
-
+	vector< vector<int> > component_list = connected_component_list();
 	for(const auto& component : component_list) {	//itero tutte le componenti connesse
 		pairwise += component.size() * (component.size()-1 );
 	}
@@ -137,4 +217,15 @@ int toDigit(char *c) {
 	return c - '0';
 }
 
-
+//Reduced_Graph::Reduced_Graph(Graph original, set<int> deleted_vertices) : Graph(int nodes, int edges, int* num_neighbours) {
+//	adj = new vector<int>[num_nodes];
+//	//adj = new list<int>[nodes];
+//	degrees = new int[nodes];
+//
+//	for(int i=0; i < nodes; i++) {
+//		adj[i] = new int[num_neighbours[i]];
+//		degrees[i] = num_neighbours[i]; 	//=0?
+//	}
+//}
+//
+//Reduced_Graph::~Reduced_Graph() {

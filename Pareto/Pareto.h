@@ -13,6 +13,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+#include <fstream>
+#include <bitset>
 
 class ParetoFront {
 public:
@@ -35,14 +38,18 @@ private:
 
 class BandBnode {
 public:
-	BandBnode(int id, int livello);
+	BandBnode(int id, int livello, int size);
+	BandBnode(int id, int livello, std::bitset, std::bitset);
 	~BandBnode();
 	bool useful(ParetoFront* PF);
 
 private:
-	int id, livello, id_figlio; //debug, non essenziali
-	BandBnode *prec, *succ; //nodi contigui
-	int var, type; // tipo di branching
+	int id, livello; //id_figlio; //debug, non essenziali
+//	BandBnode *prec, *succ; //nodi contigui
+//	int var, type; // tipo di branching
 	int LB[2]; //soluzioni del nodo //  LB[0] == PWC     LB[1] == COSTO
+	int UB[2];
+	std::bitset saved_nodes;
+	std::bitset deleted_nodes;
 };
 #endif //PROJECT_PARETO_H
