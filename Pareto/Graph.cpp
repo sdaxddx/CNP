@@ -188,7 +188,7 @@ vector< vector<int> > Graph::connected_component_list() {
 	for(int n=0; n < num_nodes; n++) {	//itero tutti i nodi guardando se sono visitati o meno
 		if(visited[n]==false) {	//se non sono visitati faccio una DEPTH SEARCH
 			depth_search(n, visited, &component_list[i]);
-			i++;	//poiché ho trovato tutti i nodi di una componente passo alla successiva
+			i++;	//poichï¿½ ho trovato tutti i nodi di una componente passo alla successiva
 		}
 	}
 	return component_list;
@@ -199,7 +199,7 @@ void Graph::depth_search(int n, bool* visited, vector<int>* vect) {
 	vect->push_back(n);	//aggiungo il nodo alla componente attuale
 
 	for(const auto& node : adj[n]) {	//itero per tutti i nodi adiacenti
-		if(!visited[node])	//se il nodo non è visitato applica una DEPTH SEARCH
+		if(!visited[node])	//se il nodo non ï¿½ visitato applica una DEPTH SEARCH
 			depth_search(node, visited, vect);
 	}
 }
