@@ -214,7 +214,7 @@ int Graph::pairwise() {
 }
 
 int toDigit(char *c) {
-	return c - '0';
+	return (int) c - '0';
 }
 
 //Reduced_Graph::Reduced_Graph(Graph original, set<int> deleted_vertices) : Graph(int nodes, int edges, int* num_neighbours) {
