@@ -39,7 +39,7 @@ protected:
 	unsigned int num_edges;
 	int* degrees;
 
-	vector< vector<int> > adj;//vector of vector of type int
+	vector<int> *adj;//array of vectors (nodes are in array, adjacency list in vectors)
 	//unordered_map< int, set<int> > adj;
 
 	set<int> edges;	//set of edges
@@ -60,9 +60,6 @@ public:
 	Graph(Graph* g);
 	virtual ~Graph();
 
-	template<class T> T *alloc_nodes(void);
-	template<class T> T *alloc_edges(void);
-
 	int get_num_nodes() const {return num_nodes; };
 	int get_num_edges() const {return num_edges; };
 
@@ -80,7 +77,7 @@ public:
 
 	vector<int>* /*const*/ get_adgacency(int i) const {
 		assert(0<=i && i<num_nodes);
-		    return adj[i];
+		    return &adj[i];
 		}
 //
 //	vector< pair<int,int> > get_edge_list() const {
@@ -104,13 +101,14 @@ public:
 	void del_node(int i);
 
 	int get_max_degree();
-	void gen_vertex_cover();
+	int gen_vertex_cover(vector<int>& res);
 
 	void update_Graph(std::bitset* removed_nodes);
 
 	void load_graph(ifstream *file, string *name);
 
 	vector<vector<int>> connected_component_list();
+	int components(bitset& del_set, int *components, int *comp_size); //passing a deletion bitset, it returns the number of components and assign each node to a component
 
 	void depth_search(int n, bool* visited, vector<int>* vect);
 

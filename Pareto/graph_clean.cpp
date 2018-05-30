@@ -12,7 +12,7 @@
 
 #include <math.h>
 
-#include "defns.hpp" 
+#include "defns_clean.hpp"
 
 #define __debug_vertex_cover__ 0
 #define __debug_add_one_node__ 0
@@ -155,7 +155,7 @@ Graph::alloc_edges(void)
 Graph::Graph(int n, int m, int *sizeneigh)
   :Nr_nodes(n), Nr_edges(m)
 {
-  adj_list=alloc_nodes<int*>();
+  adj_list=alloc_nodes<int*>(); // = new int*[Nr_nodes];
   deg=alloc_nodes<int>();
   for(int i=0; i<Nr_nodes; i++) {
     adj_list[i]=new int[sizeneigh[i]];
@@ -262,7 +262,7 @@ Graph::components(const BitSet& DelSet, int *label, int *size) const
 
 
   for(int i=0; i<Nr_nodes; ++i) {
-    if( !DelSet.member(i) && label[i]<0 ) {// se il nodo i non è nei nodi cancellati e non fa parte di nessuna componente// 
+    if( !DelSet.member(i) && label[i]<0 ) {// se il nodo i non ï¿½ nei nodi cancellati e non fa parte di nessuna componente// 
       S.enqueue(i);
       label[i]=cnt;
 //fprintf(stderr,"Nodo %d forma componente %d\n",i,cnt);
@@ -333,7 +333,7 @@ Graph::evaluate_add_node(const BitSet& DelSet, int i,
         cout<<" "<<adj(i)[j]<<" ("<<label[adj(i)[j]]<<", "<<size[label[adj(i)[j]]]<<")";
       cout<<endl;
     }
-    new_size+=size[*si];//cioè si parte da 1, il nodo che si sta valutando, + la numerosità delle attuali componenti
+    new_size+=size[*si];//cioï¿½ si parte da 1, il nodo che si sta valutando, + la numerositï¿½ delle attuali componenti
     old_nr_conn+= size[*si]*(size[*si]-1)/2;// conta il numero di connessioni con le attuali componenti
   }
 
@@ -341,7 +341,7 @@ Graph::evaluate_add_node(const BitSet& DelSet, int i,
   cout<<"new_size="<<new_size<<" old_nr_conn="<<old_nr_conn<<endl;
 #endif
 
-  return new_size*(new_size-1)/2-old_nr_conn;//  tra tutti nodi che si vogliono inserire, si prende quello per cui l'aumento di connessioni è minimo..
+  return new_size*(new_size-1)/2-old_nr_conn;//  tra tutti nodi che si vogliono inserire, si prende quello per cui l'aumento di connessioni ï¿½ minimo..
 }
 
 
@@ -358,7 +358,7 @@ Graph::update_components_after_add_node(BitSet& DelSet, int i,
       if( label[v]>=0 && !S.count(label[v]) ) {
         S.insert(label[v]);
         new_size+=size[label[v]];
-        size[label[v]] = 0;//le altre componenti diventano di dimensone nulla perchè sono unite da i e dai suoi vicini
+        size[label[v]] = 0;//le altre componenti diventano di dimensone nulla perchï¿½ sono unite da i e dai suoi vicini
       }
     }
   }
@@ -367,7 +367,7 @@ Graph::update_components_after_add_node(BitSet& DelSet, int i,
   //  cout<<"VUOTA! (deg="<<degree(i)<<")"<<endl;
 
   int comp_idx;
-  if(new_size > 1)//se ho trovato almeno un vicino di i, devo unire le componenti, sennò no
+  if(new_size > 1)//se ho trovato almeno un vicino di i, devo unire le componenti, sennï¿½ no
   {
     comp_idx = *(S.begin());
     size[comp_idx] = new_size;//assegna la nuova dimensione alla prima componente in S.
@@ -583,7 +583,7 @@ Graph::gen_random_vertex_cover(vector<int>& res)// restituisce in res i nodi app
     for(int j=0; j<degree(cur); ++j) { //per tutti i vicini del nodo corrente
       int v=adj(cur)[j];
       //cout<<"v="<<v<<endl;
-      if(!C.member(v)) { //se non c'è in C, lo aggiungiamo
+      if(!C.member(v)) { //se non c'ï¿½ in C, lo aggiungiamo
 	C.add(v);
         //if(check.member(v)) fprintf(stderr,"he ho, %d dÃ©jÃ  effacÃ© !! -> %d\n",v,degg[v]);
 	N.erase(I[v]);
@@ -1201,16 +1201,16 @@ int Graph::heur_add_general(int K, vector<int>& res, int n, char x, int partial,
 
     if(cand.size() > 0)
     {
-      int pos=rand()%cand.size(); //nel caso di più candidati: sceglie a caso..
+      int pos=rand()%cand.size(); //nel caso di piï¿½ candidati: sceglie a caso..
       int cur=cand[pos];
       S->del(cur); //toglie da S, ovvero aggiunge cur al grafo finale
-      num--; //un nodo è stato aggiunto
+      num--; //un nodo ï¿½ stato aggiunto
       //fprintf(stderr,"num = %d\n", num);
 
       if(n == 1 || n == 3)
         C += bestC; // variazione funzione obiettivo
       if(n == 2 && bestC > C)
-        C = bestC; // -> senza il test fra bestC e obj, darebbe la dimensione della componente creata dall'introduzione del nodo cur, che non è per forza la più grande !
+        C = bestC; // -> senza il test fra bestC e obj, darebbe la dimensione della componente creata dall'introduzione del nodo cur, che non ï¿½ per forza la piï¿½ grande !
 
       update_components_after_add_node_general(*S, cur, label, size, &Nr_comps); //riaggiorna le componenti
 //fprintf(stderr," now C = %d\n", C);
@@ -1224,7 +1224,7 @@ int Graph::heur_add_general(int K, vector<int>& res, int n, char x, int partial,
   } /* while */
 
   res.clear();
-  for(int i=0; i<NumNodes(); ++i) {//mette i nodi appartenenti a S, cioè nodi da cancellare, nel vettore res..
+  for(int i=0; i<NumNodes(); ++i) {//mette i nodi appartenenti a S, cioï¿½ nodi da cancellare, nel vettore res..
     if( S->member(i) ) {
       res.push_back(i);
     }
