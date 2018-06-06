@@ -56,12 +56,12 @@ protected:
 
 public:
 	Graph(int nodes, int edges, int *num_neighbours);
-	Graph(FILE* f);
-	Graph(Graph* g);
+	explicit Graph(std::ifstream &GraphFile);
+	explicit Graph(Graph* g);
 	virtual ~Graph();
 
-	int get_num_nodes() const {return num_nodes; };
-	int get_num_edges() const {return num_edges; };
+	inline int get_num_nodes() const {return num_nodes; };
+	inline int get_num_edges() const {return num_edges; };
 
 	int get_degree(int i) const
 	  {
@@ -72,7 +72,7 @@ public:
 	inline int eidx(int i, int j) const 	//edge index; assegna un ID a ciascun edge tramite una funzione con parametri i e j
 	  {
 	    assert(i>j);
-	    return ((i*(i-1))>>1) + j; // i * (i-1) diviso due + j..//
+	    return ((i*(i-1))/2) + j; // i * (i-1) diviso due + j..//
 	  }
 
 	vector<int>* /*const*/ get_adgacency(int i) const {
@@ -103,12 +103,12 @@ public:
 	int get_max_degree();
 	int gen_vertex_cover(vector<int>& res);
 
-	void update_Graph(std::bitset* removed_nodes);
+	//void update_Graph(std::bitset &removed_nodes);
 
 	void load_graph(ifstream *file, string *name);
 
 	vector<vector<int>> connected_component_list();
-	int components(bitset& del_set, int *components, int *comp_size); //passing a deletion bitset, it returns the number of components and assign each node to a component
+	//int components(std::bitset &del_set, int *components, int *comp_size); //passing a deletion bitset, it returns the number of components and assign each node to a component
 
 	void depth_search(int n, bool* visited, vector<int>* vect);
 

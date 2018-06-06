@@ -8,6 +8,8 @@
 #include "Graph.h"
 #include <algorithm>
 #include <queue>
+#include <sstream>
+#include <iostream>
 
 Graph::Graph(int nodes, int edges, int* num_neighbours) : num_nodes(nodes), num_edges(edges) {
 	adj = new vector<int>[nodes];   //creo l'array di vettori
@@ -21,8 +23,57 @@ Graph::Graph(int nodes, int edges, int* num_neighbours) : num_nodes(nodes), num_
 }
 
 //TODO
-Graph::Graph(FILE *f) {
+Graph::Graph(std::ifstream &GraphFile) {
+    std::string line, token;
+    std::stringstream ss, buf;
 
+    cout << "Prova creazione\n";
+
+    int num, num_adj, node, adj_node;
+
+    if (GraphFile.is_open())
+        cout << "aperto\n";
+
+        getline(GraphFile, line);
+        num = stoi(line);
+        cout << num << "\n";
+        num_nodes = num;
+        adj = new vector<int>[num];
+        degrees = new int[num];
+
+
+
+	while(!GraphFile.eof()) {
+        while (getline(GraphFile,
+                       line)) {    //getline(istream& is, string& str[, char delim]) prende una riga del file e la salva in str, finché non trova [delim o ] \n
+            ss.str(line);
+
+            getline(ss, token, ':');
+            cout << token;
+            buf
+            try {
+                buf >> node;
+            }
+            catch (std::invalid_argument) {}
+
+            num_adj = 0;
+
+            while (getline(ss, token, ' ')) {
+                try {
+                    adj_node = stoi(token);
+                }
+                catch (invalid_argument) {}
+
+                if (!adj_node<0) {
+                    adj[node].push_back(stoi(token));
+                    ++num_adj;
+                }
+            }
+
+            degrees[node] = num_adj;
+
+        }
+    }
 }
 
 Graph::Graph(Graph* g) :num_nodes(g->num_nodes), num_edges(g->num_edges), adj(g->adj), degrees(g->degrees) {
@@ -55,6 +106,7 @@ void Graph::add_edge(int i, int j) {    //TODO ottimizzare inserimento
 	assert(i>j);
 	adj[i].push_back(j);
 	adj[j].push_back(i);
+	edges.insert(eidx(i,j));
 }
 
 //void Graph::del_edge(int i, int j) {
@@ -74,6 +126,7 @@ void Graph::del_edge(int i, int j) {    //TODO ottimizzare eliminazione
     for (int n = 0; n < size_i; ++n) {
         if (n == j) {
             adj[i].erase(adj[i].begin() + n); //se n == j cancello n dal vettore di adiacenza
+			--num_edges;	//diminuisco numero archi
             break; //perché grafo semplice senza loop;
         }
     }
@@ -84,17 +137,19 @@ void Graph::del_edge(int i, int j) {    //TODO ottimizzare eliminazione
             break;
         }
     }
-}
-
-void Graph::del_node(int i) {
-	num_nodes--;
-	for(auto const& node : adj[i]) {	//cancel all adjacency node of i
-		del_edge(i, node);
-		num_edges--;
-	}
-	adj.erase( (adj.begin(), adj.end(), adj[i]), adj.end() );	//cancel i from the adjacency list
+    edges.erase(eidx(i,j));
 
 }
+
+//void Graph::del_node(int i) {
+//	num_nodes--;
+//	for(auto const& node : adj[i]) {	//cancel all adjacency node of i
+//		del_edge(i, node);
+//		num_edges--;
+//	}
+//	adj.erase( (adj.begin(), adj.end(), adj[i]), adj.end() );	//cancel i from the adjacency list
+//
+//}
 
 int Graph::get_max_degree() {
 	int max = 0;
@@ -105,79 +160,55 @@ int Graph::get_max_degree() {
 	return max;
 }
 
-int Graph::gen_vertex_cover(vector<int>& res) {
-	vector<int> deg(num_nodes);
-	std::bitset<num_nodes> C;
-	int edges = 0, cur = 0;
+//int Graph::gen_vertex_cover(vector<int>& res) {
+//	vector<int> deg(num_nodes);
+//	std::bitset<num_nodes> C;
+//	int edges = 0, cur = 0;
+//
+//
+//	for(int i=0; i<num_nodes; i++) {
+//		deg[i] = this->degrees[i];
+//		C[i] = 0;
+//	}
+//
+//	  do {
+//		  int maxi = 0;
+//		  for(int i=0; i<num_nodes; i++) {
+//		      if(deg[i] > maxi && C[i] == 0)
+//		    	  maxi = deg[i];
+//		      	  cur = i;
+//		    }
+//
+//	      C[cur] = 1;
+//	    //cout<<"cur==-1 => "<<cur<<endl;
+//
+//	    //cout<<"Qui, cur="<<cur<<endl;
+//
+//	    for(int j=0; j<this->degrees[cur]; ++j) { //per tutti i vicini del nodo corrente
+//	    	if(C[adj[cur][j]] == 0) {
+//	    		deg[adj[cur][j]]--;
+//	    		edges++;
+//	    	}
+//	    }
+//	  } while(edges<num_edges);
+//
+//	  res.clear();
+//	  for(int i=0; i<num_nodes; ++i) {
+//	    if( C[i] == 1 ) {
+//	      res.push_back(i);
+//	    }
+//	  }
+//
+//	  return C.size();
+//
+//}
 
-
-	for(int i=0; i<num_nodes; i++) {
-		deg[i] = this->degrees[i];
-		C[i] = 0;
-	}
-
-	  do {
-		  int maxi = 0;
-		  for(int i=0; i<num_nodes; i++) {
-		      if(deg[i] > maxi && C[i] == 0)
-		    	  maxi = deg[i];
-		      	  cur = i;
-		    }
-
-	      C[cur] = 1;
-	    //cout<<"cur==-1 => "<<cur<<endl;
-
-	    //cout<<"Qui, cur="<<cur<<endl;
-
-	    for(int j=0; j<this->degrees[cur]; ++j) { //per tutti i vicini del nodo corrente
-	    	if(C[adj[cur][j]] == 0) {
-	    		deg[adj[cur][j]]--;
-	    		edges++;
-	    	}
-	    }
-	  } while(edges<num_edges);
-
-	  res.clear();
-	  for(int i=0; i<num_nodes; ++i) {
-	    if( C[i] == 1 ) {
-	      res.push_back(i);
-	    }
-	  }
-
-	  return C.size();
-
-}
-
-void Graph::update_Graph(std::bitset* removed_nodes) {
-	for(std::size_t i = 0; i < removed_nodes->size(); ++i) {	//for all nodes passed delete them from graph
+/*void Graph::update_Graph(std::bitset& removed_nodes) {
+	for(std::size_t i = 0; i < removed_nodes.size(); ++i) {	//for all nodes passed delete them from graph
 		if (removed_nodes[i] == 1)
 			del_node(i);
 	}
-}
-
-void Graph::load_graph(ifstream *file, string *name) {
-	string file_string;
-	char* tkn;
-
-	file(name, ifstream::in);
-	file_string << file;
-
-	char* buf_file = file_string;
-	file->close();
-
-	tkn = strtok(buf_file, "\n");
-	while(tkn != nullptr) {
-		char* bufline = strtok(tkn, " ;");
-		int i = toDigit(bufline);
-
-		while(bufline != nullptr) {
-			add_edge(i, toDigit(bufline));
-			tkn = (strtok(NULL, " ;"));
-		}
-
-		tkn = (strtok(NULL, "\n"));
-	}
-}
+}*/
 
 vector< vector<int> > Graph::connected_component_list() {
 	bool* visited = new bool[num_nodes];	//array che conta i nodi visitati
@@ -196,42 +227,43 @@ vector< vector<int> > Graph::connected_component_list() {
 	}
 	return component_list;
 }
-int Graph::components(bitset &del_set, int *components, int *comp_size) {
-	int count=0, current_size; //number of components and size of each one
 
-	queue<int> S;	//coda con nodi da esaminare
-
-	for (int i = 0; i < num_nodes; ++i) {
-		components[i] = -1;
-	}
-
-	for (int i = 0; i <num_nodes ; ++i) {
-		if(!del_set[i] && components[i]<0) {	//se il nodo non è nei cancellati e non appartiene già a una componente
-			S.push(i);
-			components[i] = count;	//assegno il nodo i alla componente attuale
-			current_size = 1;	//inizializzo il numero di nodi nella componente
-
-			while (!S.empty()) {	//finché esistono nodi da esaminare (adiacenti a i e a cascata)
-				int k = S.front();	//seleziono il primo elemento
-				S.pop();	//e lo elimino poiché lo sto esaminando
-
-				for (int j = 0; j < degrees[k] ; ++j) {
-					const int adj_node = adj[k][j];	//per tutti i nodi adiacenti a quello esaminato
-
-					if(!del_set[adj_node] && components[adj_node]<0) {	//se il nodo non è nei cancellati e non appartiene a una componente
-						components[adj_node] = count;	//lo inserisco nella componente attuale
-						current_size++;	//aumento la dimensione della componente
-						S.push(adj_node);	//e inserisco il nodo in quelli da esaminare
-					}
-				}
-			}
-			if(comp_size)
-				comp_size[count] = current_size; //assegno a ogni componente la sua dimensione
-			count++; //passo alla componente successiva
-		}
-	}
-	return ++count;
-}
+//int Graph::components(bitset &del_set, int *components, int *comp_size) {
+//	int count=0, current_size; //number of components and size of each one
+//
+//	queue<int> S;	//coda con nodi da esaminare
+//
+//	for (int i = 0; i < num_nodes; ++i) {
+//		components[i] = -1;
+//	}
+//
+//	for (int i = 0; i <num_nodes ; ++i) {
+//		if(!del_set[i] && components[i]<0) {	//se il nodo non è nei cancellati e non appartiene già a una componente
+//			S.push(i);
+//			components[i] = count;	//assegno il nodo i alla componente attuale
+//			current_size = 1;	//inizializzo il numero di nodi nella componente
+//
+//			while (!S.empty()) {	//finché esistono nodi da esaminare (adiacenti a i e a cascata)
+//				int k = S.front();	//seleziono il primo elemento
+//				S.pop();	//e lo elimino poiché lo sto esaminando
+//
+//				for (int j = 0; j < degrees[k] ; ++j) {
+//					const int adj_node = adj[k][j];	//per tutti i nodi adiacenti a quello esaminato
+//
+//					if(!del_set[adj_node] && components[adj_node]<0) {	//se il nodo non è nei cancellati e non appartiene a una componente
+//						components[adj_node] = count;	//lo inserisco nella componente attuale
+//						current_size++;	//aumento la dimensione della componente
+//						S.push(adj_node);	//e inserisco il nodo in quelli da esaminare
+//					}
+//				}
+//			}
+//			if(comp_size)
+//				comp_size[count] = current_size; //assegno a ogni componente la sua dimensione
+//			count++; //passo alla componente successiva
+//		}
+//	}
+//	return ++count;
+//}
 
 
 void Graph::depth_search(int n, bool* visited, vector<int>* vect) {
@@ -269,3 +301,14 @@ int toDigit(char *c) {
 //}
 //
 //Reduced_Graph::~Reduced_Graph() {
+
+int main() {
+    std::ifstream file;
+    file.open("Graph_Example.txt");
+    Graph g = Graph(file);
+    file.close();
+
+    cout << "Number of nodes =" << g.get_num_nodes() << "\n";
+    cout << "Degree of node 7: " << g.get_degree(7);
+    return 0;
+}

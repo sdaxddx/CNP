@@ -14,7 +14,6 @@
 #include <string>
 
 //#include <ilcplex/cplex.h>
-
 using namespace std;
 
 #define __DEFNS_HPP__
@@ -208,7 +207,7 @@ public:
   { 
     //pair<int, int> tmp(i,j);
     //return edge_set.count(tmp);
-    return edge_set.count(eidx(i,j))>0; //count funzione di set, conta il numero di container con quel valore, puo ssere o 0 o 1, perchè n set solo valori diversi//
+    return edge_set.count(eidx(i,j))>0; //count funzione di set, conta il numero di container con quel valore, puo ssere o 0 o 1, perchï¿½ n set solo valori diversi//
   }
 
   inline bool has_edge(int i, int j) const 
