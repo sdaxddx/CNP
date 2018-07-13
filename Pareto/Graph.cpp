@@ -23,7 +23,7 @@ Graph::Graph(int nodes, int edges, int* num_neighbours) : num_nodes(nodes), num_
 }
 
 //TODO
-Graph::Graph(std::ifstream &GraphFile) {
+Graph::Graph(std::ifstream &GraphFile)  {
     std::string line, token;
     std::stringstream ss, buf;
 
