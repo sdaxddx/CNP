@@ -25,6 +25,7 @@ public:
 	void SavePareto(FILE *f);   //salva ogni soluzione sul file passato
 	bool DominatedPoint(int PWC, int cost); //controlla se la soluzione passata è dominata da quelle del fronte
 	void UpdatePareto(int PWC, int cost, int time); //aggiorna il fronte se la soluzione passata non è dominata
+	inline int get_dim() {return dim; }
 
 private:
 	//or package
@@ -39,8 +40,19 @@ private:
 class BandBnode {
 public:
 	BandBnode(int id, int livello, int size);
-	BandBnode(int id, int livello, std::bitset, std::bitset);
+	BandBnode(int id, int livello, std::bitset<500> saved, std::bitset<500> deleted);
 	~BandBnode();
+
+	inline int* get_UB(){ return UB;}
+	inline int* get_LB(){ return LB;}
+	inline int get_id() const { return id;}
+	inline int get_livello() { return livello;}
+	inline void set_id(int id) {		this->id = id;	}
+	inline void set_livello(int livello) {		this->livello = livello;	}
+	inline std::bitset<500> get_saved() { return saved_nodes;}
+	inline std::bitset<500> get_deleted() { return deleted_nodes;}
+
+
 	bool useful(ParetoFront* PF);
 
 private:
@@ -49,7 +61,7 @@ private:
 //	int var, type; // tipo di branching
 	int LB[2]; //soluzioni del nodo //  LB[0] == PWC     LB[1] == COSTO
 	int UB[2];
-	std::bitset saved_nodes;
-	std::bitset deleted_nodes;
+	std::bitset<500> saved_nodes;
+	std::bitset<500> deleted_nodes;
 };
 #endif //PROJECT_PARETO_H

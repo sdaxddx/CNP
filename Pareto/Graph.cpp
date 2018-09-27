@@ -4,12 +4,13 @@
  *  Created on: 15 mag 2018
  *      Author: Sdaxddx
  */
-
+/*
 #include "Graph.h"
 #include <algorithm>
 #include <queue>
+#include <iostream>
 
-Graph::Graph(int nodes, int edges, int* num_neighbours) : num_nodes(nodes), num_edges(edges) {
+Graph::Graph(unsigned nodes, unsigned edges, int* num_neighbours) : num_nodes(nodes), num_edges(edges) {
 	adj = new vector<int>[nodes];   //creo l'array di vettori
 	//adj = new list<int>[nodes];
 	degrees = new int[nodes];
@@ -86,15 +87,14 @@ void Graph::del_edge(int i, int j) {    //TODO ottimizzare eliminazione
     }
 }
 
-void Graph::del_node(int i) {
-	num_nodes--;
-	for(auto const& node : adj[i]) {	//cancel all adjacency node of i
-		del_edge(i, node);
-		num_edges--;
-	}
-	adj.erase( (adj.begin(), adj.end(), adj[i]), adj.end() );	//cancel i from the adjacency list
-
-}
+//void Graph::del_node(int i) {
+//	num_nodes--;
+//	for(auto const& node : adj[i]) {	//cancel all adjacency node of i
+//		del_edge(i, node);
+//		num_edges--;
+//	}
+//	adj.erase( (adj.begin(), adj.end(), adj[i]), adj.end() );	//cancel i from the adjacency list
+//}
 
 int Graph::get_max_degree() {
 	int max = 0;
@@ -269,3 +269,5 @@ int toDigit(char *c) {
 //}
 //
 //Reduced_Graph::~Reduced_Graph() {
+
+*/

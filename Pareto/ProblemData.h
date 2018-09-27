@@ -9,15 +9,19 @@
 #define PARETO_PROBLEMDATA_H_
 
 #include "Graph.cpp"
+#include "Grafo.h"
+#include <bitset>
 
 class ProblemData {
 public:
-	ProblemData(FILE* f);
+	explicit ProblemData(std::ifstream& f);
 	virtual ~ProblemData();
+	inline Graph::Grafo get_original() { return original;}
+	inline Graph::Grafo get_current() { return current;}
 
-	void update_current(std::bitset* removed_nodes);
+	void update_current(std::bitset<500>* removed_nodes);
 protected:
-	Graph original, current;
+	Graph::Grafo original, current;
 };
 
 #endif /* PARETO_PROBLEMDATA_H_ */

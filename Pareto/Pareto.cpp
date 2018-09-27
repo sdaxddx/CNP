@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <bitset>
+#include <list>
 
 ParetoFront::ParetoFront(int dim, int costMAX) {
 	this->dim = dim;
@@ -85,11 +87,11 @@ BandBnode::BandBnode(int id, int livello, int size) {
 //	this->type = 0;
 //	this->var = 0;
 //	this->id_figlio = 0;
-	saved_nodes = new bitset<size>();
-	deleted_nodes = new bitset<size>();
+	saved_nodes = std::bitset<500>{};
+	deleted_nodes = std::bitset<500>();
 }
 
-BandBnode::BandBnode(int id, int livello, std::bitset saved, std::bitset deleted) {	//create a new node with the bitset passed
+BandBnode::BandBnode(int id, int livello, std::bitset<500> saved, std::bitset<500> deleted) {	//create a new node with the bitset passed
 	this->id = id;
 	this->livello = livello;
 //	LB = {0,0};
@@ -192,15 +194,15 @@ bool BandBnode::useful(ParetoFront* PF) {
  ******	DIFFERENT METHOD	******
  ******						******
  ********************************/
-void insert_BnBnode(BandBnode *node, list<BandBnode*> *list, int VisitStrategy) {
+void insert_BnBnode(BandBnode *node, std::list<BandBnode*> *list, int VisitStrategy) {
 	if(VisitStrategy == DEPTH_FIRST)
 		list->push_front(node);
 	else if (VisitStrategy == BREADTH_FIRST)
 		list->push_back(node);
 	else if (VisitStrategy == BEST_FIRST) {		//ANCHE: (PWC MASSIMA- PWC ATTUALE)/ costo
-		for(const auto& temp :list) {
-			if (node->LB[0] >= temp->LB[0])
-				list->insert(node, temp);
+		for(const auto& temp :*list) {
+			if (node->get_LB()[0] >= temp->get_LB()[0])
+				list->insert(*node, *temp);
 			}
 		}
 	}
@@ -230,7 +232,7 @@ void insert_BnBnode(BandBnode *node, list<BandBnode*> *list, int VisitStrategy) 
 //
 //void delete_List (BandBnode* List){
 //	BandBnode* q;
-//	for(q = firstlist(List); is_emptylist(List); cancel_from_List(q));	//no q = q->succ perché cancel_from_list dopo aver cancellato passa la secondo elemento
+//	for(q = firstlist(List); is_emptylist(List); cancel_from_List(q));	//no q = q->succ perchï¿½ cancel_from_list dopo aver cancellato passa la secondo elemento
 //	delete q;
 //	delete List;
 //}
@@ -252,22 +254,22 @@ void insert_BnBnode(BandBnode *node, list<BandBnode*> *list, int VisitStrategy) 
 //}
 
 void calculate_LB(BandBnode* node, ProblemData* PD) {
-	PD->update_current(&node->deleted_nodes);
+	PD->update_current(node->get_deleted());
 
-	node->LB[0] = PD->current.pairwise();	//pairwise minima (grafo senza tutti nodi tranne quelli non eliminati)
-	node->LB[1] = node->deleted_nodes.count();	//costo minimo (solo nodi eliminati)
+	node->get_LB()[0] = PD->get_current().pairwise();	//pairwise minima (grafo senza tutti nodi tranne quelli non eliminati)
+	node->get_LB()[1] = node->get_deleted().count();	//costo minimo (solo nodi eliminati)
 }
 
 void calculate_UB(BandBnode* node, ProblemData* PD) {
-	PD->update_current(node->deleted_nodes.flip());
-	node->deleted_nodes.flip();
+	PD->update_current(node->get_deleted().flip());
+	node->get_deleted().flip();
 
-	node->UB[0] = PD->current.pairwise(); //pairwise massima (grafo senza nodi eliminati e senza nodi non visitati)
-	node->UB[1] = node->saved_nodes.size() - node->saved_nodes.count();	//costo massimo (nodi eliminati e nodi ancora non visitati)
+	node->get_UB()[0] = PD->get_current().pairwise(); //pairwise massima (grafo senza nodi eliminati e senza nodi non visitati)
+	node->get_UB()[1] = node->get_saved().size() - node->get_saved().count();	//costo massimo (nodi eliminati e nodi ancora non visitati)
 }
 
 int node_to_process(ProblemData* PD) {	//select the node to process taking the max degree avaible
-	return PD->current.get_max_degree();
+	return PD->get_current().get_max_degree();
 }
 
 // Function that computes a LB for objective 1, used inside the B&B algorithm
@@ -308,29 +310,29 @@ int node_LB2(ProblemData *pPD,...)
 //}
 
 //TODO calculate time
-bool Process_BandBnode(list<BandBnode>* list, ProblemData *PD, ParetoFront* PF, long int time_start, int visitStrategy) {
-	timeval end;
-	BandBnode* node = list->front();
+bool Process_BandBnode(std::list<BandBnode*> list, ProblemData *PD, ParetoFront* PF, long int time_start, int visitStrategy) {
+	//timeval end;
+	BandBnode* node = list.front();
 	calculate_LB(node, PD);
-	if(!node->useful(PF)) {	//se la pwc minima del nodo attuale è maggiore uguale alla soluzione corrente con pari costo finisco e ritorno false
-		list->remove(*node);
+	if(!node->useful(PF)) {	//se la pwc minima del nodo attuale ï¿½ maggiore uguale alla soluzione corrente con pari costo finisco e ritorno false
+		list.remove(node);
 		return false;
 	}
 
 	calculate_UB(node, PD);	//altrimenti calcolo UB e inserisco due nuovi nodi alla lista
 
-	int bit_to_remove = PD->current.get_max_degree();	//trovo il prossimo nodo da eliminare
+	int bit_to_remove = PD->get_current().get_max_degree();	//trovo il prossimo nodo da eliminare
 
-	std::bitset temp_bitset1 = new bitset<PF->dim>(node->deleted_nodes.to_ulong());	//creo i due bitset di nodi rimossi
-	std::bitset temp_bitset2 = new bitset<PF->dim>(node->deleted_nodes.to_ulong());
+	std::bitset<500>* temp_bitset1 = new std::bitset<500>(node->get_deleted().to_ulong());	//creo i due bitset di nodi rimossi
+	std::bitset<500>* temp_bitset2 = new std::bitset<500>(node->get_deleted().to_ulong());
 
-	temp_bitset1.set(bit_to_remove, 1);
+	temp_bitset1->set(bit_to_remove, 1);
 
 
-	BandBnode* primo = new BandBnode(node->id++, node->livello++, node->deleted_nodes);	//TODO set bit to 0
-	BandBnode* secondo = new BandBnode(node->id+2, node->livello++, node->deleted_nodes);	//TODO set bit to 1
-	insert_BnBnode(primo, list, visitStrategy);
-	insert_BnBnode(secondo, list, visitStrategy);
+	BandBnode* primo = new BandBnode(node->get_id()+1, node->get_livello()+1, std::bitset<500>(), std::bitset<500>());	//TODO set bit to 0
+	BandBnode* secondo = new BandBnode(node->get_id()+2, node->get_livello()+1, std::bitset<500>(), std::bitset<500>());	//TODO set bit to 1
+	insert_BnBnode(primo, &list, visitStrategy);
+	insert_BnBnode(secondo, &list, visitStrategy);
 	return true;
 
 }
@@ -413,28 +415,29 @@ void Solve_BB(ProblemData *pPD, int time, ParetoFront *PF, long int time_start)
 
 
 void Solve_BB(ProblemData* PD, ParetoFront* PF, int time, long int time_start) {
-	timeval start, end;
-	list<BandBnode> visited_nodes, waiting_nodes;
+	//timeval start, end;
+	std::list<BandBnode*> visited_nodes, waiting_nodes;
 	int removedNodes, id, livello;
 
 	int visitStrategy = BEST_FIRST; //BREADTH_FIRST, DEPTH_FIRST
 
-	BandBnode root = new BandBnode(1, 1, new bitset<PD->original.num_nodes>());	//creo il nodo radice con id 1, livello 1 e bitset impostato a 0 (tutti i nodi presenti)
-	Process_BandBnode(root, PD, PF,time_start, visitStrategy);
+	BandBnode* root =  new BandBnode(1, 1, std::bitset<500>(), std::bitset<500>());	//creo il nodo radice con id 1, livello 1 e bitset impostato a 0 (tutti i nodi presenti)
+	waiting_nodes.push_front(root);
+	Process_BandBnode(waiting_nodes, PD, PF,time_start, visitStrategy);
 
 	visited_nodes.push_front(root);
 
 	while(!waiting_nodes.empty()) {
 		if (Process_BandBnode(waiting_nodes, PD, PF, time_start, visitStrategy) )
 			removedNodes++;	//se il nodo viene chiuso aumento i nodi rimossi
-		visited_nodes.push_back(waiting_nodes.front());
+		visited_nodes.push_back(waiting_nodes.front()); //scriverlo prima?
 	}
 
 }
 
 int main() {
 	BandBnode Lista = new BandBnode[];
-	BandBnode nodo = new BandBnode;
+	BandBnode nodo = new BandBnode();
 	nodo.id = 66;
 	insert_before(&Lista, new BandBnode);
 	insert_before(&Lista, new BandBnode);

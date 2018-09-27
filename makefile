@@ -1,11 +1,11 @@
 
-all: Pareto.exe
+all: Grafo.exe
 
 clean:	
-	rm	main.o	Pareto.exe
+	rm	main.o	Grafo.exe
 
-Pareto.exe: main.o
-	g++ -g -o Pareto main.o
+Graph.exe: main.o
+	g++ -g -o Grafo main.o
 
 main.o:
-	g++ -c -g Pareto.cpp
+	g++ -c -g Grafo.cpp

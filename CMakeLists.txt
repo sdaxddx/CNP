@@ -3,4 +3,4 @@ project(Project)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Project Pareto/Graph.cpp)
+add_executable(Project Pareto/Grafo.cpp Pareto/Grafo.h)

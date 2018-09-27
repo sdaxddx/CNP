@@ -5,6 +5,7 @@
  *      Author: Sdaxddx
  */
 
+
 #ifndef PARETO_GRAPH_H_
 #define PARETO_GRAPH_H_
 #include <vector>
@@ -18,10 +19,54 @@
 
 using namespace std;
 
+
+typedef unsigned int BitCell;
+
+class BitSet {
+protected:
+    static const size_t CellSize;
+    int Nr_Cells;
+    BitCell *buf;   //array di unsigned int (array di BitCell)
+
+    void init(int n);
+    inline int Cell_idx(int x) const { return (x/CellSize); } //inline = macro in c++
+    inline int Cell_ofs(int x) const { return x%CellSize; }
+    inline BitCell mask(int x) const { return ((BitCell)1)<<Cell_ofs(x); } //<<moltiplicazione pr 2 o multipli  //cast 1 a bitcell (unsigned int)
+public:
+    int size;
+    explicit BitSet(int maxsize);   //explicit per evitare inizializzazioni involontarie con interi
+    BitSet(const BitSet& S);    //copia?
+    ~BitSet();
+
+    inline int max_size() const { return Nr_Cells*CellSize; }   //dimensione dati BitSet
+    inline void add(int x) {if(!member(x)) size++; buf[Cell_idx(x)]|=mask(x);}
+    inline void del(int x) {if(member(x)) size--; buf[Cell_idx(x)]&= ~mask(x);}
+    inline bool member(int x) const { return (buf[Cell_idx(x)]&mask(x))!=0; }
+    inline int cell_card(BitCell x) const {
+        int res=0;
+        for(res=0; x; x>>=1) {  // x>>=1   ==   x/2
+            if( x&((BitCell)1) )    //casta 1 a bitcell(unsigned int) e confronta con x ... controlla se x ha l'ultimo bit a 1
+                ++res;
+            x>>=1;
+        }
+        return res;
+    }
+    void merge(const BitSet& S);
+    void intersect(const BitSet& S);
+    void copy(const BitSet& S);
+    void clear(void);
+    bool equal(const BitSet& S);
+
+    int get_hamming_distance_from(const BitSet& S) const;
+
+    void dump(void);
+
+};
+
 struct Node {
-	unsigned int id;
-	unsigned int degree;
-	vector<int> neighbours;
+    unsigned int id;
+    unsigned int degree;
+    vector<int> neighbours;
 };
 
 /*
@@ -39,8 +84,8 @@ protected:
 	unsigned int num_edges;
 	int* degrees;
 
-	vector<int> *adj;//array of vectors (nodes are in array, adjacency list in vectors)
-	//unordered_map< int, set<int> > adj;
+    vector<int> *adj;//array of vectors (nodes are in array, adjacency list in vectors)
+    //unordered_map< int, set<int> > adj;
 
 	set<int> edges;	//set of edges
 	/*
@@ -55,9 +100,9 @@ protected:
 	//vector<Node> node_vector;
 
 public:
-	Graph(int nodes, int edges, int *num_neighbours);
-	Graph(FILE* f);
-	Graph(Graph* g);
+	Graph(unsigned nodes, unsigned edges, int *num_neighbours);
+	explicit Graph(FILE* f);
+	explicit Graph(Graph* g);
 	virtual ~Graph();
 
 	int get_num_nodes() const {return num_nodes; };
@@ -103,7 +148,6 @@ public:
 	int get_max_degree();
 	int gen_vertex_cover(vector<int>& res);
 
-	void update_Graph(std::bitset* removed_nodes);
 
 	void load_graph(ifstream *file, string *name);
 
@@ -113,6 +157,10 @@ public:
 	void depth_search(int n, bool* visited, vector<int>* vect);
 
 	int pairwise();
+
+	vector<int>* get_adj() {
+	    return adj;
+	}
 };
 
 //class Reduced_Graph: public Graph {

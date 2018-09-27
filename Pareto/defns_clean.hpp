@@ -22,7 +22,7 @@ using namespace std;
 const char *errmsg(const char *fmt, ...);
 
 #define MAX_NODES 30000
-#define MAX_EDGES ((MAX_NODES*(MAX_NODES-1))>>1)
+#define MAX_EDGES ((MAX_NODES*(MAX_NODES-1))>>1)    //diviso due
 
 //#define IL_STD
 
@@ -186,11 +186,11 @@ public:
     return ((i*(i-1))>>1) + j; // i * (i-1) diviso due + j..//
   }
 
-
-  inline int degree(int i) const 
-  { 
-    assert(0<=i && i<Nr_nodes); 
-    return deg[i]; 
+    i) const
+    {
+        assert(0<=i && i<Nr_nodes);
+        return deg[i];
+        inline int degree(int
   }
 
   inline const int *adj(int i) const 
@@ -208,7 +208,7 @@ public:
   { 
     //pair<int, int> tmp(i,j);
     //return edge_set.count(tmp);
-    return edge_set.count(eidx(i,j))>0; //count funzione di set, conta il numero di container con quel valore, puo ssere o 0 o 1, perchè n set solo valori diversi//
+    return edge_set.count(eidx(i,j))>0; //count funzione di set, conta il numero di container con quel valore, puo ssere o 0 o 1, perchï¿½ n set solo valori diversi//
   }
 
   inline bool has_edge(int i, int j) const 
