@@ -14,7 +14,6 @@
 #include <string>
 
 //#include <ilcplex/cplex.h>
-
 using namespace std;
 
 #define __DEFNS_HPP__
